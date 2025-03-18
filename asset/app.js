@@ -822,8 +822,7 @@ class Game {
       "BREAKER",
       "0. 1. 4",
       "press R key to Start",
-      "press M key to see manual!",
-      "MADE BY SAUP819",
+      "press M key to see Manual!",
     ];
 
     ctx.fillStyle = "#000000";
@@ -857,6 +856,8 @@ class Game {
     ctx.strokeStyle = "rgba(121, 134, 203, 10)";
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
+
+    // 현재 공의 개수
     this.ballsNumber = balls.balls.filter(
       (ball) => ball.state == 0 || ball.state == 1
     ).length;
@@ -868,81 +869,49 @@ class Game {
     ctx.font = "25px BM YEONSUNG OTF";
     ctx.fillStyle = "rgb(50, 177, 108)";
     ctx.fillText("+" + balls.addNumber, canvasWidth / 2, canvasHeight / 2 + 40);
+
+        // 흰색 글씨: 점수 표시
+    ctx.font = "25px BM YEONSUNG OTF"; // 텍스트의 글꼴과 크기 설정 (같은 크기)
+    ctx.fillStyle = "rgb(255, 255, 255)"; // 텍스트 색상 (흰색)
+    ctx.fillText("Level: " + this.crrScore, canvasWidth / 2, canvasHeight / 2 + 70); // 점수 표시
   }
 
-  drawGameOver(ctx, canvasWidth, canvasHeight, t) {
-    if (!this.name) {
-      alert(`게임 종료! 당신이 깬 블록 수는 ${this.crrScore}개 입니다.`);
-      this.name = window.prompt("What's Your Name? (within 10 char)");
-      if (this.name.length > 10) this.name = "";
-      if (!!this.name)
-        this.bord.push({ name: this.name, score: this.crrScore });
-      this.bord.sort((a, b) => b.score - a.score).reverse();
-      localStorage.setItem(
-        "bord",
-        JSON.stringify(this.encodeArray(JSON.stringify(this.bord)))
-      );
-    }
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    ctx.shadowColor = "#f384ae";
-    ctx.font = "100px BM YEONSUNG OTF";
-    ctx.fillStyle = "#fdd700";
-    if (this.highScore > this.crrScore) {
+
+    drawGameOver(ctx, canvasWidth, canvasHeight, t) {
+      // 게임 오버 화면
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.shadowColor = "#f384ae";
+      ctx.font = "100px BM YEONSUNG OTF";
+      ctx.fillStyle = "#fdd700";
       ctx.fillText("Game Over", canvasWidth / 2, 70);
-    } else {
-      ctx.fillText("New Record!", canvasWidth / 2, 70);
-      this.highScore = this.bord[0].score;
+    
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+      ctx.font = "40px BM YEONSUNG OTF";
+      ctx.fillText("Your Score: " + this.crrScore, canvasWidth / 2, 135);
+    
+      // "press X key to restart!" 메시지 출력
+      this.fontSize += Math.sin(t / 100) * 0.02;
+      ctx.font = `${this.fontSize}px BM YEONSUNG OTF`;
+      ctx.fillText("press X key to restart!", canvasWidth / 2, canvasHeight - 50);
+    
+      // 'X' 키 눌렀을 때 게임 재시작
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'x' || e.key === 'X') {
+          this.state = 0; // 게임 초기화 상태
+          this.crrScore = 0; // 점수 초기화
+          this.game.state = 0; // 게임 상태를 시작 화면으로 설정
+          this.balls.init(canvasWidth, canvasHeight); // 공 초기화
+        }
+      });
     }
-
-    ctx.shadowOffsetX = 1;
-    ctx.shadowOffsetY = 1;
-    ctx.font = "40px BM YEONSUNG OTF";
-    ctx.fillText("Your Score: " + this.crrScore, canvasWidth / 2, 135);
-
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.font = "20px BM YEONSUNG OTF";
-
-    ctx.fillStyle = "#ff384e";
-    ctx.fillText("RANK", 50, 200);
-    ctx.fillStyle = "#fdd700";
-    ctx.fillText("NAME", 160, 200);
-    ctx.fillStyle = "rgb(50, 177, 108)";
-    ctx.fillText("SCORE", 270, 200);
-    ctx.fillStyle = "#fdd700";
-    for (let i in this.bord) {
-      let size = 25;
-      if (i < 15) {
-        ctx.fillStyle = "#ff384e";
-        ctx.fillText(`${+i + 1}`, 50, 225 + size * i);
-        ctx.fillStyle = "#fdd700";
-        ctx.font = "15px BM YEONSUNG OTF";
-        ctx.fillText(`${this.bord[i].name}`, 160, 225 + size * i);
-        ctx.fillStyle = "rgb(50, 177, 108)";
-        ctx.font = "20px BM YEONSUNG OTF";
-        ctx.fillText(`${this.bord[i].score}`, 270, 225 + size * i);
-        ctx.fillStyle = "#fdd700";
-      } else if (i < 30) {
-        ctx.fillStyle = "#ff384e";
-        ctx.fillText(`${+i + 1}`, 50 + 280, 225 + size(i - 15));
-        ctx.fillStyle = "#fdd700";
-        ctx.font = "15px BM YEONSUNG OTF";
-        ctx.fillText(`${this.bord[i].name}`, 160 + 280, 225 + size * (i - 15));
-        ctx.fillStyle = "rgb(50, 177, 108)";
-        ctx.font = "20px BM YEONSUNG OTF";
-        ctx.fillText(`${this.bord[i].score}`, 270 + 280, 225 + size * (i - 15));
-        ctx.fillStyle = "#fdd700";
-      }
-    }
-    this.fontSize += Math.sin(t / 100) * 0.02;
-    ctx.font = `${this.fontSize}px BM YEONSUNG OTF`;
-    ctx.fillText("press R key to restart!", canvasWidth / 2, canvasHeight - 50);
-  }
+  
 
   drawManual(ctx) {
     ctx.fillStyle = "#000000";
